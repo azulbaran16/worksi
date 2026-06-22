@@ -11,7 +11,10 @@ const benefits = [
 ];
 
 export default function Employers() {
-  useDocumentTitle("For Employers");
+  useDocumentTitle(
+    "For Employers",
+    "Hire reliable, pre-screened talent fast — temporary, temp-to-perm or permanent. From one hire to a full crew."
+  );
   return (
     <div>
       <section className="bg-brand-900 text-white">

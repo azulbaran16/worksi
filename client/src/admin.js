@@ -62,6 +62,10 @@ export const adminApi = {
   deleteJob: (token, id) =>
     fetch(`${BASE}/api/admin/jobs/${id}`, { method: "DELETE", headers: authHeaders(token, false) }).then(handle),
 
+  // Contact messages
+  listMessages: (token) =>
+    fetch(`${BASE}/api/admin/messages`, { headers: authHeaders(token, false) }).then(handle),
+
   // Recruiters (ADMIN only)
   listUsers: (token) => fetch(`${BASE}/api/auth/users`, { headers: authHeaders(token, false) }).then(handle),
   createUser: (token, data) =>

@@ -8,7 +8,10 @@ import useDocumentTitle from "../useDocumentTitle.js";
 import { SITE } from "../config.js";
 
 export default function Contact() {
-  useDocumentTitle("Contact");
+  useDocumentTitle(
+    "Contact",
+    "Get in touch with WorkSi about jobs or hiring. Head office in Mississauga, Ontario."
+  );
   const [params] = useSearchParams();
   const initialType = params.get("type") === "employer" ? "employer" : "candidate";
   const [form, setForm] = useState({ type: initialType, name: "", email: "", phone: "", company: "", message: "" });

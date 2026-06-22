@@ -13,7 +13,7 @@ export default function JobDetail() {
   const [job, setJob] = useState(null);
   const [status, setStatus] = useState("loading");
   const [related, setRelated] = useState([]);
-  useDocumentTitle(job?.title);
+  useDocumentTitle(job?.title, job?.summary);
   const toast = useToast();
 
   useEffect(() => {

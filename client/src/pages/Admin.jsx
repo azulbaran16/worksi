@@ -3,6 +3,7 @@ import { adminApi } from "../admin.js";
 import Spinner from "../components/Spinner.jsx";
 import ApplicationsTab from "../components/admin/ApplicationsTab.jsx";
 import JobsTab from "../components/admin/JobsTab.jsx";
+import MessagesTab from "../components/admin/MessagesTab.jsx";
 import RecruitersTab from "../components/admin/RecruitersTab.jsx";
 
 const STORE_KEY = "worksi_session";
@@ -35,6 +36,7 @@ export default function Admin() {
   const tabs = [
     { key: "applications", label: "Applications" },
     { key: "jobs", label: "Jobs" },
+    { key: "messages", label: "Messages" },
     ...(isAdmin ? [{ key: "recruiters", label: "Recruiters" }] : []),
   ];
 
@@ -69,6 +71,7 @@ export default function Admin() {
       <div className="mt-6">
         {tab === "applications" && <ApplicationsTab token={session.token} onAuthError={onAuthError} />}
         {tab === "jobs" && <JobsTab token={session.token} onAuthError={onAuthError} />}
+        {tab === "messages" && <MessagesTab token={session.token} onAuthError={onAuthError} />}
         {tab === "recruiters" && isAdmin && <RecruitersTab token={session.token} onAuthError={onAuthError} />}
       </div>
     </div>

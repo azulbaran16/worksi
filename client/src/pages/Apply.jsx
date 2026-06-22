@@ -81,7 +81,10 @@ export default function Apply() {
   const [job, setJob] = useState(null);
   const [jobLoading, setJobLoading] = useState(Boolean(slug));
   const [jobNotFound, setJobNotFound] = useState(false);
-  useDocumentTitle(job ? `Apply: ${job.title}` : "Apply");
+  useDocumentTitle(
+    job ? `Apply: ${job.title}` : "Apply",
+    "Apply to WorkSi in minutes — upload your resume and add your work experience."
+  );
   const toast = useToast();
 
   const draft = useMemo(loadDraft, []);
@@ -156,6 +159,7 @@ export default function Apply() {
       if (!form.lastName.trim()) e.lastName = "Required";
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Valid email required";
       if (!form.phone.trim()) e.phone = "Required";
+      else if (form.phone.replace(/\D/g, "").length < 10) e.phone = "Enter a valid phone number";
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -176,6 +180,9 @@ export default function Apply() {
     setSubmitError("");
     if (!validateStep(1)) {
       setStep(1);
+      return;
+    }
+    if (!resume && !window.confirm("Submit without a resume? Attaching one helps recruiters match you faster.")) {
       return;
     }
     setSubmitting(true);
@@ -521,6 +528,12 @@ function StepReview({ form, job, resume, experiences, education }) {
         <Row k="Education" v={`${education.length} entr${education.length === 1 ? "y" : "ies"}`} />
         <Row k="Skills" v={form.skills} />
       </div>
+
+      {!resume && (
+        <p className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
+          No resume attached. You can still submit, but adding one helps recruiters match you faster.
+        </p>
+      )}
     </div>
   );
 }

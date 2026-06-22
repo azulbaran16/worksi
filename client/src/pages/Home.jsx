@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api.js";
 import { Icon } from "../icons.jsx";
 import JobCard from "../components/JobCard.jsx";
+import JobCardSkeleton from "../components/JobCardSkeleton.jsx";
 import HeroArt from "../components/HeroArt.jsx";
 import { CategoryArt } from "../components/CategoryArt.jsx";
 import Avatar from "../components/Avatar.jsx";
@@ -56,11 +57,16 @@ const testimonials = [
 
 export default function Home() {
   const [featured, setFeatured] = useState([]);
+  const [loadingJobs, setLoadingJobs] = useState(true);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.listJobs().then((jobs) => setFeatured(jobs.slice(0, 6))).catch(() => {});
+    api
+      .listJobs()
+      .then((jobs) => setFeatured(jobs.slice(0, 6)))
+      .catch(() => {})
+      .finally(() => setLoadingJobs(false));
   }, []);
 
   function onSearch(e) {
@@ -172,11 +178,13 @@ export default function Home() {
           </Link>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((job, i) => (
-            <Reveal key={job.id} delay={(i % 3) * 90}>
-              <JobCard job={job} />
-            </Reveal>
-          ))}
+          {loadingJobs
+            ? Array.from({ length: 6 }).map((_, i) => <JobCardSkeleton key={i} />)
+            : featured.map((job, i) => (
+                <Reveal key={job.id} delay={(i % 3) * 90}>
+                  <JobCard job={job} />
+                </Reveal>
+              ))}
         </div>
         <div className="mt-8 text-center sm:hidden">
           <Link to="/jobs" className="btn-outline">View all jobs</Link>

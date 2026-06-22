@@ -18,6 +18,8 @@ export default function ApplicationsTab({ token, onAuthError }) {
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [query, setQuery] = useState("");
   const toast = useToast();
 
   function fail(err) {
@@ -43,17 +45,49 @@ export default function ApplicationsTab({ token, onAuthError }) {
 
   if (loading) return <Center><Spinner className="h-8 w-8 text-brand-600" /></Center>;
 
+  const q = query.trim().toLowerCase();
+  const filtered = apps.filter((a) => {
+    if (statusFilter && a.status !== statusFilter) return false;
+    if (!q) return true;
+    const hay = `${a.firstName} ${a.lastName} ${a.email} ${a.jobTitleSnapshot || ""}`.toLowerCase();
+    return hay.includes(q);
+  });
+
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-muted">{apps.length} application{apps.length === 1 ? "" : "s"}</p>
+      <div className="card mb-4 grid gap-3 p-3 sm:grid-cols-[1fr_auto_auto]">
+        <div className="relative">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+            <Icon.Search width={16} height={16} />
+          </span>
+          <input
+            className="field pl-9"
+            placeholder="Search name, email or position"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label="Search applications"
+          />
+        </div>
+        <select className="field" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} aria-label="Filter by status">
+          <option value="">All statuses</option>
+          {STATUSES.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
         <button className="btn-outline" onClick={load}>Refresh</button>
       </div>
 
+      <p className="mb-3 text-sm text-muted">
+        {filtered.length} of {apps.length} application{apps.length === 1 ? "" : "s"}
+      </p>
+
       {apps.length === 0 && <p className="card p-8 text-center text-muted">No applications yet.</p>}
+      {apps.length > 0 && filtered.length === 0 && (
+        <p className="card p-8 text-center text-muted">No applications match your filters.</p>
+      )}
 
       <div className="space-y-3">
-        {apps.map((a) => (
+        {filtered.map((a) => (
           <div key={a.id} className="card overflow-hidden">
             <button
               className="flex w-full items-center justify-between gap-4 p-4 text-left"

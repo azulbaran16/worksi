@@ -3,28 +3,17 @@ import { useSearchParams } from "react-router-dom";
 import { api, EMPLOYMENT_LABELS } from "../api.js";
 import { Icon } from "../icons.jsx";
 import JobCard from "../components/JobCard.jsx";
+import JobCardSkeleton from "../components/JobCardSkeleton.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Autocomplete from "../components/Autocomplete.jsx";
 import { jobSuggestLoader, SuggestionRow } from "../components/jobSuggest.jsx";
 import useDocumentTitle from "../useDocumentTitle.js";
 
-function JobCardSkeleton() {
-  return (
-    <div className="card flex flex-col gap-3 p-5">
-      <div className="skeleton h-5 w-3/4 rounded" />
-      <div className="skeleton h-3 w-1/3 rounded" />
-      <div className="skeleton h-3 w-full rounded" />
-      <div className="skeleton h-3 w-5/6 rounded" />
-      <div className="mt-2 flex justify-between">
-        <div className="skeleton h-6 w-24 rounded-full" />
-        <div className="skeleton h-4 w-20 rounded" />
-      </div>
-    </div>
-  );
-}
-
 export default function Jobs() {
-  useDocumentTitle("Find Jobs");
+  useDocumentTitle(
+    "Find Jobs",
+    "Browse temporary, temp-to-perm and permanent jobs across Canada and apply directly in minutes."
+  );
   const [params, setParams] = useSearchParams();
   const [jobs, setJobs] = useState([]);
   const [categories, setCategories] = useState([]);
