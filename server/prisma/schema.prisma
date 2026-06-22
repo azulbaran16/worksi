@@ -12,6 +12,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model RecruiterUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  // ADMIN can manage other recruiters; RECRUITER is a standard account
+  role         String   @default("RECRUITER")
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
 model Job {
   id             String   @id @default(cuid())
   slug           String   @unique

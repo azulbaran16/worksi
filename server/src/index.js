@@ -9,6 +9,7 @@ import jobsRouter from "./routes/jobs.js";
 import applicationsRouter from "./routes/applications.js";
 import contactRouter from "./routes/contact.js";
 import adminRouter from "./routes/admin.js";
+import authRouter from "./routes/auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -30,6 +31,7 @@ app.get("/api/health", (_req, res) => res.json({ ok: true }));
 app.use("/api/jobs", jobsRouter);
 app.use("/api/applications", applicationsRouter);
 app.use("/api/contact", contactRouter);
+app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
 
 // Serve the built frontend in production (single-service deploy)

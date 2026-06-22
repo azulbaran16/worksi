@@ -8,8 +8,12 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "20"
-      - key: ADMIN_TOKEN
+      - key: JWT_SECRET
         generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@worksi.net
+      - key: ADMIN_PASSWORD
+        sync: false # set this in the Render dashboard before first deploy
       - key: DATABASE_URL
         value: file:/data/worksi.db
     disk:

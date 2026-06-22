@@ -2,21 +2,16 @@ import { Router } from "express";
 import path from "node:path";
 import { prisma } from "../db.js";
 import { UPLOAD_DIR } from "../upload.js";
+import { requireAuth } from "../auth.js";
+import { uniqueJobSlug } from "../slug.js";
 
 const router = Router();
 
-// Lightweight token guard. Send header: Authorization: Bearer <ADMIN_TOKEN>
-function requireAdmin(req, res, next) {
-  const token = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
-  if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-  next();
-}
+// Every /api/admin route requires a valid recruiter session
+router.use(requireAuth);
 
-router.use(requireAdmin);
+/* ----------------------------- Applications ----------------------------- */
 
-// GET /api/admin/applications
 router.get("/applications", async (req, res, next) => {
   try {
     const { status } = req.query;
@@ -25,7 +20,10 @@ router.get("/applications", async (req, res, next) => {
     const applications = await prisma.application.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      include: { experiences: { orderBy: { sortOrder: "asc" } }, education: { orderBy: { sortOrder: "asc" } } },
+      include: {
+        experiences: { orderBy: { sortOrder: "asc" } },
+        education: { orderBy: { sortOrder: "asc" } },
+      },
     });
     res.json(applications);
   } catch (err) {
@@ -33,7 +31,6 @@ router.get("/applications", async (req, res, next) => {
   }
 });
 
-// PATCH /api/admin/applications/:id  { status }
 router.patch("/applications/:id", async (req, res, next) => {
   try {
     const updated = await prisma.application.update({
@@ -46,7 +43,6 @@ router.patch("/applications/:id", async (req, res, next) => {
   }
 });
 
-// GET /api/admin/applications/:id/resume  -> download the resume
 router.get("/applications/:id/resume", async (req, res, next) => {
   try {
     const app = await prisma.application.findUnique({ where: { id: req.params.id } });
@@ -57,11 +53,88 @@ router.get("/applications/:id/resume", async (req, res, next) => {
   }
 });
 
-// GET /api/admin/messages
 router.get("/messages", async (_req, res, next) => {
   try {
     const messages = await prisma.contactMessage.findMany({ orderBy: { createdAt: "desc" } });
     res.json(messages);
+  } catch (err) {
+    next(err);
+  }
+});
+
+/* -------------------------------- Jobs --------------------------------- */
+
+const JOB_FIELDS = [
+  "title",
+  "category",
+  "location",
+  "employmentType",
+  "payRange",
+  "summary",
+  "description",
+  "requirements",
+  "isActive",
+  "featured",
+];
+
+const VALID_TYPE = new Set(["TEMPORARY", "TEMP_TO_PERM", "PERMANENT"]);
+
+function pickJobData(body) {
+  const data = {};
+  for (const f of JOB_FIELDS) {
+    if (body[f] === undefined) continue;
+    if (f === "isActive" || f === "featured") data[f] = Boolean(body[f]);
+    else if (f === "employmentType") data[f] = VALID_TYPE.has(body[f]) ? body[f] : "PERMANENT";
+    else data[f] = body[f] === null ? null : String(body[f]);
+  }
+  return data;
+}
+
+// GET /api/admin/jobs  -> all jobs (including inactive) + application counts
+router.get("/jobs", async (_req, res, next) => {
+  try {
+    const jobs = await prisma.job.findMany({
+      orderBy: [{ createdAt: "desc" }],
+      include: { _count: { select: { applications: true } } },
+    });
+    res.json(jobs);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/admin/jobs
+router.post("/jobs", async (req, res, next) => {
+  try {
+    const data = pickJobData(req.body);
+    if (!data.title || !data.category || !data.location || !data.summary || !data.description) {
+      return res.status(400).json({ error: "Title, category, location, summary and description are required." });
+    }
+    data.slug = await uniqueJobSlug(data.title);
+    const job = await prisma.job.create({ data });
+    res.status(201).json(job);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PATCH /api/admin/jobs/:id
+router.patch("/jobs/:id", async (req, res, next) => {
+  try {
+    const data = pickJobData(req.body);
+    if (data.title) data.slug = await uniqueJobSlug(data.title, req.params.id);
+    const job = await prisma.job.update({ where: { id: req.params.id }, data });
+    res.json(job);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/admin/jobs/:id
+router.delete("/jobs/:id", async (req, res, next) => {
+  try {
+    await prisma.job.delete({ where: { id: req.params.id } });
+    res.json({ ok: true });
   } catch (err) {
     next(err);
   }

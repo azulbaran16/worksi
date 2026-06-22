@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 const jobs = [
@@ -119,6 +120,21 @@ const jobs = [
   },
 ];
 
+async function seedAdmin() {
+  const email = (process.env.ADMIN_EMAIL || "admin@worksi.net").toLowerCase();
+  const password = process.env.ADMIN_PASSWORD || "ChangeMe123!";
+  const name = process.env.ADMIN_NAME || "WorkSi Admin";
+  const existing = await prisma.recruiterUser.findUnique({ where: { email } });
+  if (existing) {
+    console.log(`Admin user already exists: ${email}`);
+    return;
+  }
+  await prisma.recruiterUser.create({
+    data: { email, name, role: "ADMIN", passwordHash: await bcrypt.hash(password, 10) },
+  });
+  console.log(`Created admin user: ${email} (password from ADMIN_PASSWORD env, default "ChangeMe123!")`);
+}
+
 async function main() {
   console.log("Seeding jobs...");
   for (const job of jobs) {
@@ -129,6 +145,7 @@ async function main() {
     });
   }
   console.log(`Seeded ${jobs.length} jobs.`);
+  await seedAdmin();
 }
 
 main()

@@ -15,7 +15,10 @@ in a database and managed from a recruiter dashboard.
   4. Dynamic **work experience** (add/remove multiple roles)
   5. Education
   6. Review & submit
-- **Recruiter dashboard** (`/admin`): view applications, change status, download resumes.
+- **Recruiter dashboard** (`/admin`) with email + password login (JWT):
+  - **Applications:** view, change status, download resumes.
+  - **Jobs:** create / edit / delete postings, toggle active & featured (no code needed).
+  - **Recruiters** (admin only): add recruiter accounts, enable/disable, reset passwords.
 - **REST API** with file uploads and optional email notifications.
 - **Database** via Prisma — SQLite by default (zero config), switchable to PostgreSQL.
 
@@ -50,7 +53,9 @@ npm run dev
 
 - Frontend: http://localhost:5173
 - API: http://localhost:4000
-- Recruiter dashboard: http://localhost:5173/admin (token = `ADMIN_TOKEN` in `server/.env`)
+- Recruiter dashboard: http://localhost:5173/admin
+  - Default login (created by the seed): `ADMIN_EMAIL` / `ADMIN_PASSWORD` from `server/.env`
+    (defaults: `admin@worksi.net` / `ChangeMe123!` — **change these in production**).
 
 ## 📦 Production build
 
@@ -102,8 +107,10 @@ A `render.yaml` is included for one-click setup on Render.
 ## 🔐 Security & data notes
 
 - Candidate resumes are stored in `server/uploads/` and are **git-ignored** — never commit them.
-- The dashboard is protected by a single `ADMIN_TOKEN`. Set a strong value in production. For
-  multiple recruiters / proper auth, replace the token guard in `server/src/routes/admin.js`.
+- The dashboard uses real recruiter accounts (email + password, bcrypt-hashed) with JWT sessions.
+  Set a strong, random `JWT_SECRET` and change the seeded admin password in production.
+- Roles: `ADMIN` can manage other recruiters and jobs; `RECRUITER` can manage jobs and
+  applications. Add/disable recruiters from the dashboard's **Recruiters** tab.
 - Always run behind HTTPS in production.
 
 ## 🗂️ Project structure
@@ -126,9 +133,11 @@ NewWorksi/
 
 ## 🧩 Managing jobs
 
-Sample jobs are seeded from `server/prisma/seed.js`. To add/edit jobs you can:
+The easiest way is the **Jobs** tab in the recruiter dashboard (`/admin`) — create, edit, delete,
+and toggle active/featured with no code.
 
-- Edit `seed.js` and re-run `npm run db:setup`, **or**
-- Use a DB GUI: `npx prisma studio` (run inside `server/`), **or**
-- Build an admin "create job" form (the `Job` model is ready in `schema.prisma`).
+Other options:
+
+- Sample jobs are seeded from `server/prisma/seed.js`; edit it and re-run `npm run db:setup`.
+- Use a DB GUI: `npx prisma studio` (run inside `server/`).
 ```
