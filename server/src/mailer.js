@@ -28,6 +28,30 @@ export async function notifyNewApplication(application) {
         `Engagement: ${application.engagementType}\n`,
     });
   } catch (err) {
-    console.error("Email notification failed:", err.message);
+    console.error("Recruiter notification failed:", err.message);
+  }
+}
+
+// Confirmation email sent to the candidate after they apply.
+export async function confirmApplicantReceipt(application) {
+  if (!transporter || !application.email) return;
+  const position = application.jobTitleSnapshot || "your application";
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_USER,
+      to: application.email,
+      subject: `We received your application — WorkSi`,
+      text:
+        `Hi ${application.firstName},\n\n` +
+        `Thanks for applying to ${position} with WorkSi. We've received your application and our ` +
+        `recruitment team will review it shortly. If there's a match, we'll reach out by phone or email.\n\n` +
+        `What happens next:\n` +
+        `1. We review your profile\n` +
+        `2. A recruiter gets in touch if there's a fit\n` +
+        `3. Training, onboarding, and matching with the right employer\n\n` +
+        `Thanks,\nThe WorkSi Team`,
+    });
+  } catch (err) {
+    console.error("Applicant confirmation failed:", err.message);
   }
 }

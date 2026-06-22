@@ -3,6 +3,7 @@ import { adminApi } from "../../admin.js";
 import { EMPLOYMENT_LABELS } from "../../api.js";
 import { Icon } from "../../icons.jsx";
 import Spinner from "../Spinner.jsx";
+import { useToast } from "../Toast.jsx";
 
 const STATUSES = ["NEW", "REVIEWING", "SHORTLISTED", "REJECTED", "HIRED"];
 const statusColor = {
@@ -17,9 +18,11 @@ export default function ApplicationsTab({ token, onAuthError }) {
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState(null);
+  const toast = useToast();
 
   function fail(err) {
     if (err.message === "UNAUTHORIZED") onAuthError();
+    else toast(err.message || "Something went wrong", "error");
   }
 
   function load() {
@@ -32,6 +35,7 @@ export default function ApplicationsTab({ token, onAuthError }) {
     try {
       await adminApi.setApplicationStatus(token, id, status);
       setApps((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
+      toast(`Status updated to ${status}`);
     } catch (err) {
       fail(err);
     }

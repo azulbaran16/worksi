@@ -4,16 +4,19 @@ import { EMPLOYMENT_LABELS } from "../../api.js";
 import { Icon } from "../../icons.jsx";
 import Spinner from "../Spinner.jsx";
 import JobForm from "./JobForm.jsx";
+import { useToast } from "../Toast.jsx";
 
 export default function JobsTab({ token, onAuthError }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null); // job object or {} for new
   const [error, setError] = useState("");
+  const toast = useToast();
 
   function fail(err) {
     if (err.message === "UNAUTHORIZED") return onAuthError();
     setError(err.message);
+    toast(err.message || "Something went wrong", "error");
   }
 
   function load() {
@@ -23,10 +26,12 @@ export default function JobsTab({ token, onAuthError }) {
   useEffect(load, [token]);
 
   async function save(data) {
-    if (editing?.id) await adminApi.updateJob(token, editing.id, data);
+    const editingId = editing?.id;
+    if (editingId) await adminApi.updateJob(token, editingId, data);
     else await adminApi.createJob(token, data);
     setEditing(null);
     load();
+    toast(editingId ? "Job updated" : "Job created");
   }
 
   async function remove(job) {
@@ -34,6 +39,7 @@ export default function JobsTab({ token, onAuthError }) {
     try {
       await adminApi.deleteJob(token, job.id);
       load();
+      toast("Job deleted");
     } catch (err) {
       fail(err);
     }

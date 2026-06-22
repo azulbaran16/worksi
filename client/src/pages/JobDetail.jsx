@@ -3,24 +3,53 @@ import { Link, useParams } from "react-router-dom";
 import { api, EMPLOYMENT_LABELS } from "../api.js";
 import { Icon } from "../icons.jsx";
 import Spinner from "../components/Spinner.jsx";
+import JobCard from "../components/JobCard.jsx";
+import Reveal from "../components/Reveal.jsx";
 import useDocumentTitle from "../useDocumentTitle.js";
+import { useToast } from "../components/Toast.jsx";
 
 export default function JobDetail() {
   const { slug } = useParams();
   const [job, setJob] = useState(null);
   const [status, setStatus] = useState("loading");
+  const [related, setRelated] = useState([]);
   useDocumentTitle(job?.title);
+  const toast = useToast();
 
   useEffect(() => {
     setStatus("loading");
+    setRelated([]);
     api
       .getJob(slug)
       .then((j) => {
         setJob(j);
         setStatus("ok");
+        // Load other jobs in the same category (excluding this one).
+        api
+          .listJobs({ category: j.category })
+          .then((all) => setRelated(all.filter((x) => x.slug !== j.slug).slice(0, 3)))
+          .catch(() => {});
       })
       .catch(() => setStatus("notfound"));
   }, [slug]);
+
+  async function share() {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: job.title, text: `${job.title} at WorkSi`, url });
+      } catch {
+        /* user cancelled the share sheet — ignore */
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      toast("Link copied to clipboard");
+    } catch {
+      toast(`Copy this link: ${url}`, "info", 7000);
+    }
+  }
 
   if (status === "loading")
     return (
@@ -90,10 +119,28 @@ export default function JobDetail() {
             <Link to={`/apply/${job.slug}`} className="btn-primary mt-5 w-full">
               Apply for this job <Icon.ArrowRight width={18} height={18} />
             </Link>
+            <button type="button" onClick={share} className="btn-outline mt-2 w-full">
+              <Icon.ExternalLink width={16} height={16} /> Share this job
+            </button>
             <Link to="/jobs" className="btn-ghost mt-2 w-full">See other jobs</Link>
           </div>
         </aside>
       </div>
+
+      {/* Related jobs */}
+      {related.length > 0 && (
+        <section className="mt-16">
+          <h2 className="text-xl font-bold sm:text-2xl">Similar jobs</h2>
+          <p className="mt-1 text-sm text-muted">More roles in {job.category}.</p>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {related.map((j, i) => (
+              <Reveal key={j.id} delay={(i % 3) * 80}>
+                <JobCard job={j} />
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

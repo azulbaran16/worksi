@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { cloneElement, isValidElement, useEffect, useId, useMemo, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useToast } from "../components/Toast.jsx";
 import { api, EMPLOYMENT_LABELS } from "../api.js";
 import { Icon } from "../icons.jsx";
 import Spinner from "../components/Spinner.jsx";
@@ -79,7 +80,9 @@ export default function Apply() {
   const { slug } = useParams();
   const [job, setJob] = useState(null);
   const [jobLoading, setJobLoading] = useState(Boolean(slug));
+  const [jobNotFound, setJobNotFound] = useState(false);
   useDocumentTitle(job ? `Apply: ${job.title}` : "Apply");
+  const toast = useToast();
 
   const draft = useMemo(loadDraft, []);
   const [step, setStep] = useState(() => draft?.step || 0);
@@ -134,9 +137,13 @@ export default function Apply() {
       .getJob(slug)
       .then((j) => {
         setJob(j);
+        setJobNotFound(false);
         setForm((f) => ({ ...f, engagementType: j.employmentType }));
       })
-      .catch(() => setJob(null))
+      .catch(() => {
+        setJob(null);
+        setJobNotFound(true);
+      })
       .finally(() => setJobLoading(false));
   }, [slug]);
 
@@ -188,7 +195,9 @@ export default function Apply() {
       localStorage.removeItem(DRAFT_KEY);
       setDone(true);
     } catch (err) {
-      setSubmitError(err.message || "Something went wrong. Please try again.");
+      const msg = err.message || "Something went wrong. Please try again.";
+      setSubmitError(msg);
+      toast(msg, "error");
     } finally {
       setSubmitting(false);
     }
@@ -212,6 +221,17 @@ export default function Apply() {
           </p>
           {jobLoading && <p className="mt-2 text-sm text-muted">Loading position…</p>}
         </div>
+
+        {jobNotFound && (
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm">
+            <span className="text-amber-800">
+              That position couldn't be found — it may have been filled. You can still submit a general application.
+            </span>
+            <Link to="/jobs" className="font-semibold text-brand-700 hover:underline">
+              Browse open jobs
+            </Link>
+          </div>
+        )}
 
         {restored && (
           <div className="mb-5 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-brand-100 bg-brand-50 p-3 text-sm">
@@ -373,11 +393,23 @@ function StepPosition({ job, value, onChange }) {
 }
 
 function Field({ label, error, children }) {
+  const inputId = useId();
+  const errId = useId();
+  // Associate the label + error message with the input for screen readers.
+  const child = isValidElement(children)
+    ? cloneElement(children, {
+        id: children.props.id || inputId,
+        "aria-invalid": error ? true : undefined,
+        "aria-describedby": error ? errId : undefined,
+      })
+    : children;
   return (
     <div>
-      <label className="label">{label}</label>
-      {children}
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      <label htmlFor={inputId} className="label">{label}</label>
+      {child}
+      {error && (
+        <p id={errId} role="alert" className="mt-1 text-xs text-red-600">{error}</p>
+      )}
     </div>
   );
 }

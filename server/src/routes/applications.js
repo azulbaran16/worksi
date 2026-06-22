@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../db.js";
 import { uploadResume } from "../upload.js";
-import { notifyNewApplication } from "../mailer.js";
+import { notifyNewApplication, confirmApplicantReceipt } from "../mailer.js";
 import { honeypotBlocked } from "../limits.js";
 
 const router = Router();
@@ -92,7 +92,8 @@ router.post("/", uploadResume.single("resume"), async (req, res, next) => {
       include: { experiences: true, education: true },
     });
 
-    notifyNewApplication(application); // fire and forget
+    notifyNewApplication(application); // fire and forget (recruiter)
+    confirmApplicantReceipt(application); // fire and forget (candidate)
 
     res.status(201).json({ ok: true, id: application.id });
   } catch (err) {

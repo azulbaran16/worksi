@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { adminApi } from "../../admin.js";
 import { Icon } from "../../icons.jsx";
 import Spinner from "../Spinner.jsx";
+import { useToast } from "../Toast.jsx";
 
 export default function RecruitersTab({ token, onAuthError }) {
   const [users, setUsers] = useState([]);
@@ -9,10 +10,12 @@ export default function RecruitersTab({ token, onAuthError }) {
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "RECRUITER" });
   const [error, setError] = useState("");
+  const toast = useToast();
 
   function fail(err) {
     if (err.message === "UNAUTHORIZED") return onAuthError();
     setError(err.message);
+    toast(err.message || "Something went wrong", "error");
   }
 
   function load() {
@@ -29,6 +32,7 @@ export default function RecruitersTab({ token, onAuthError }) {
       setForm({ name: "", email: "", password: "", role: "RECRUITER" });
       setAdding(false);
       load();
+      toast("Recruiter added");
     } catch (err) {
       fail(err);
     }
@@ -38,6 +42,7 @@ export default function RecruitersTab({ token, onAuthError }) {
     try {
       const updated = await adminApi.updateUser(token, u.id, { active: !u.active });
       setUsers((prev) => prev.map((x) => (x.id === u.id ? updated : x)));
+      toast(updated.active ? "Recruiter enabled" : "Recruiter disabled");
     } catch (err) {
       fail(err);
     }
@@ -48,7 +53,7 @@ export default function RecruitersTab({ token, onAuthError }) {
     if (!pw) return;
     try {
       await adminApi.updateUser(token, u.id, { password: pw });
-      alert("Password updated.");
+      toast("Password updated");
     } catch (err) {
       fail(err);
     }
