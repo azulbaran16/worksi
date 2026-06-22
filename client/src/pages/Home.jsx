@@ -6,11 +6,13 @@ import JobCard from "../components/JobCard.jsx";
 import HeroArt from "../components/HeroArt.jsx";
 import { CategoryArt } from "../components/CategoryArt.jsx";
 import Avatar from "../components/Avatar.jsx";
+import Reveal from "../components/Reveal.jsx";
+import Counter from "../components/Counter.jsx";
 
 const stats = [
-  { value: "4,000+", label: "Successful placements" },
-  { value: "100+", label: "Applications a day" },
-  { value: "24h", label: "Typical first response" },
+  { to: 4000, suffix: "+", label: "Successful placements" },
+  { to: 100, suffix: "+", label: "Applications a day" },
+  { to: 24, suffix: "h", label: "Typical first response" },
 ];
 
 const categories = [
@@ -111,7 +113,7 @@ export default function Home() {
           </div>
 
           <div className="hidden justify-center lg:flex">
-            <HeroArt className="w-full max-w-lg" />
+            <HeroArt className="w-full max-w-lg animate-float" />
           </div>
         </div>
       </section>
@@ -121,7 +123,11 @@ export default function Home() {
         <div className="container-page grid grid-cols-3 gap-4 py-8 text-center">
           {stats.map((s) => (
             <div key={s.label}>
-              <p className="text-2xl font-extrabold text-brand-900 sm:text-3xl">{s.value}</p>
+              <Counter
+                to={s.to}
+                suffix={s.suffix}
+                className="block text-2xl font-extrabold text-brand-900 sm:text-3xl"
+              />
               <p className="mt-1 text-xs text-muted sm:text-sm">{s.label}</p>
             </div>
           ))}
@@ -138,14 +144,16 @@ export default function Home() {
           </p>
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {values.map((v) => (
-            <div key={v.title} className="card p-6 text-center">
-              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-600">
-                <v.icon />
-              </span>
-              <h3 className="mt-4 text-lg font-bold">{v.title}</h3>
-              <p className="mt-2 text-sm text-muted">{v.text}</p>
-            </div>
+          {values.map((v, i) => (
+            <Reveal key={v.title} delay={i * 100}>
+              <div className="card h-full p-6 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-lift">
+                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-600">
+                  <v.icon />
+                </span>
+                <h3 className="mt-4 text-lg font-bold">{v.title}</h3>
+                <p className="mt-2 text-sm text-muted">{v.text}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -162,8 +170,10 @@ export default function Home() {
           </Link>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((job) => (
-            <JobCard key={job.id} job={job} />
+          {featured.map((job, i) => (
+            <Reveal key={job.id} delay={(i % 3) * 90}>
+              <JobCard job={job} />
+            </Reveal>
           ))}
         </div>
         <div className="mt-8 text-center sm:hidden">
@@ -176,17 +186,18 @@ export default function Home() {
         <div className="container-page">
           <h2 className="text-2xl font-bold sm:text-3xl">Browse by category</h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((c) => (
-              <Link
-                key={c}
-                to={`/jobs?category=${encodeURIComponent(c)}`}
-                className="card flex items-center justify-between gap-3 p-4 transition-shadow hover:shadow-lift"
-              >
-                <span className="flex items-center gap-3 font-semibold text-brand-900">
-                  <CategoryArt category={c} className="h-11 w-11" /> {c}
-                </span>
-                <Icon.ArrowRight width={18} height={18} className="text-slate-400" />
-              </Link>
+            {categories.map((c, i) => (
+              <Reveal key={c} delay={(i % 3) * 80}>
+                <Link
+                  to={`/jobs?category=${encodeURIComponent(c)}`}
+                  className="card flex items-center justify-between gap-3 p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift"
+                >
+                  <span className="flex items-center gap-3 font-semibold text-brand-900">
+                    <CategoryArt category={c} className="h-11 w-11" /> {c}
+                  </span>
+                  <Icon.ArrowRight width={18} height={18} className="text-slate-400" />
+                </Link>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -200,14 +211,16 @@ export default function Home() {
             { icon: Icon.Search, title: "1. Find a job", text: "Search live openings and pick the role that fits you." },
             { icon: Icon.Upload, title: "2. Apply directly", text: "Upload your resume, add your experience — done in minutes." },
             { icon: Icon.Users, title: "3. Get matched", text: "Our recruiters review and connect you with the employer." },
-          ].map((s) => (
-            <div key={s.title} className="card p-6 text-center">
-              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-600">
-                <s.icon />
-              </span>
-              <h3 className="mt-4 text-lg font-bold">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted">{s.text}</p>
-            </div>
+          ].map((s, i) => (
+            <Reveal key={s.title} delay={i * 100}>
+              <div className="card h-full p-6 text-center">
+                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-600">
+                  <s.icon />
+                </span>
+                <h3 className="mt-4 text-lg font-bold">{s.title}</h3>
+                <p className="mt-2 text-sm text-muted">{s.text}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -221,13 +234,15 @@ export default function Home() {
           </div>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {paths.map((p, i) => (
-              <div key={p.title} className="card relative overflow-hidden p-6">
-                <span className="absolute right-4 top-3 font-display text-5xl font-extrabold text-brand-50">
-                  {i + 1}
-                </span>
-                <h3 className="relative text-lg font-bold text-brand-900">{p.title}</h3>
-                <p className="relative mt-2 text-sm text-muted">{p.text}</p>
-              </div>
+              <Reveal key={p.title} delay={i * 100}>
+                <div className="card relative h-full overflow-hidden p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift">
+                  <span className="absolute right-4 top-3 font-display text-5xl font-extrabold text-brand-50">
+                    {i + 1}
+                  </span>
+                  <h3 className="relative text-lg font-bold text-brand-900">{p.title}</h3>
+                  <p className="relative mt-2 text-sm text-muted">{p.text}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
           <div className="mt-8 text-center">
@@ -264,12 +279,16 @@ export default function Home() {
             </ul>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {stats.concat({ value: "Daily", label: "New candidates onboarded" }).map((s) => (
+            {stats.map((s) => (
               <div key={s.label} className="card p-6 text-center">
-                <p className="text-2xl font-extrabold text-brand-900">{s.value}</p>
+                <Counter to={s.to} suffix={s.suffix} className="block text-2xl font-extrabold text-brand-900" />
                 <p className="mt-1 text-xs text-muted">{s.label}</p>
               </div>
             ))}
+            <div className="card p-6 text-center">
+              <p className="text-2xl font-extrabold text-brand-900">Daily</p>
+              <p className="mt-1 text-xs text-muted">New candidates onboarded</p>
+            </div>
           </div>
         </div>
       </section>
@@ -282,8 +301,8 @@ export default function Home() {
             <p className="mt-3 text-muted">Real relationships, real results.</p>
           </div>
           <div className="mt-10 grid gap-6 md:grid-cols-2">
-            {testimonials.map((t) => (
-              <figure key={t.name} className="card p-6">
+            {testimonials.map((t, i) => (
+              <Reveal as="figure" key={t.name} delay={i * 120} className="card p-6">
                 <span className="text-brand-200"><Icon.Quote /></span>
                 <blockquote className="mt-3 text-slate-700">"{t.quote}"</blockquote>
                 <figcaption className="mt-4 flex items-center gap-3">
@@ -293,7 +312,7 @@ export default function Home() {
                     <span className="block text-sm text-muted">{t.role}</span>
                   </span>
                 </figcaption>
-              </figure>
+              </Reveal>
             ))}
           </div>
         </div>

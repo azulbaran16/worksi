@@ -3,7 +3,22 @@ import { useSearchParams } from "react-router-dom";
 import { api, EMPLOYMENT_LABELS } from "../api.js";
 import { Icon } from "../icons.jsx";
 import JobCard from "../components/JobCard.jsx";
-import Spinner from "../components/Spinner.jsx";
+import Reveal from "../components/Reveal.jsx";
+
+function JobCardSkeleton() {
+  return (
+    <div className="card flex flex-col gap-3 p-5">
+      <div className="skeleton h-5 w-3/4 rounded" />
+      <div className="skeleton h-3 w-1/3 rounded" />
+      <div className="skeleton h-3 w-full rounded" />
+      <div className="skeleton h-3 w-5/6 rounded" />
+      <div className="mt-2 flex justify-between">
+        <div className="skeleton h-6 w-24 rounded-full" />
+        <div className="skeleton h-4 w-20 rounded" />
+      </div>
+    </div>
+  );
+}
 
 export default function Jobs() {
   const [params, setParams] = useSearchParams();
@@ -71,8 +86,10 @@ export default function Jobs() {
       {/* Results */}
       <div className="mt-6">
         {loading ? (
-          <div className="flex justify-center py-20 text-brand-600">
-            <Spinner className="h-8 w-8" />
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <JobCardSkeleton key={i} />
+            ))}
           </div>
         ) : jobs.length === 0 ? (
           <div className="card p-10 text-center text-muted">
@@ -83,8 +100,10 @@ export default function Jobs() {
           <>
             <p className="mb-4 text-sm text-muted">{jobs.length} job{jobs.length === 1 ? "" : "s"} found</p>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {jobs.map((job) => (
-                <JobCard key={job.id} job={job} />
+              {jobs.map((job, i) => (
+                <Reveal key={job.id} delay={(i % 3) * 70}>
+                  <JobCard job={job} />
+                </Reveal>
               ))}
             </div>
           </>

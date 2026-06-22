@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api, EMPLOYMENT_LABELS } from "../api.js";
 import { Icon } from "../icons.jsx";
@@ -8,6 +8,14 @@ import ExperienceEditor from "../components/ExperienceEditor.jsx";
 import EducationEditor from "../components/EducationEditor.jsx";
 
 const STEPS = ["Position", "About you", "Resume", "Experience", "Education", "Review"];
+const STEP_HINTS = [
+  "What kind of work are you after?",
+  "Your contact details — takes about a minute.",
+  "Upload a resume and add extra context (optional).",
+  "Add your recent roles so we can match you faster (optional).",
+  "Your education background (optional).",
+  "Check everything looks right, then submit.",
+];
 
 const engagementOptions = [
   { value: "PERMANENT", label: "Permanent", desc: "Long-term, full-time placement" },
@@ -45,6 +53,16 @@ export default function Apply() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [done, setDone] = useState(false);
+  const [maxReached, setMaxReached] = useState(0); // furthest step the user has visited
+  const topRef = useRef(null);
+
+  // Scroll the form into view whenever the step changes (keeps the user oriented).
+  useEffect(() => {
+    setMaxReached((m) => Math.max(m, step));
+    if (topRef.current) {
+      topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [step]);
 
   useEffect(() => {
     if (!slug) return;
@@ -78,6 +96,10 @@ export default function Apply() {
   }
   function back() {
     setStep((s) => Math.max(s - 1, 0));
+  }
+  // Jump to an already-visited step via the stepper.
+  function goTo(target) {
+    if (target <= maxReached && target !== step) setStep(target);
   }
 
   async function submit() {
@@ -113,7 +135,7 @@ export default function Apply() {
 
   return (
     <div className="container-page py-10">
-      <div className="mx-auto max-w-3xl">
+      <div ref={topRef} className="mx-auto max-w-3xl scroll-mt-20">
         <div className="mb-6">
           <h1 className="text-2xl font-bold sm:text-3xl">
             {job ? `Apply: ${job.title}` : "Apply to WorkSi"}
@@ -135,49 +157,63 @@ export default function Apply() {
             />
           </div>
           <ol className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium">
-            {STEPS.map((s, i) => (
-              <li
-                key={s}
-                className={`flex items-center gap-1.5 ${
-                  i === step ? "text-brand-700" : i < step ? "text-success-600" : "text-slate-400"
-                }`}
-              >
-                <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${
-                    i < step
-                      ? "bg-success-500 text-white"
-                      : i === step
-                      ? "bg-brand-600 text-white"
-                      : "bg-slate-200 text-slate-500"
-                  }`}
-                >
-                  {i < step ? <Icon.Check width={12} height={12} /> : i + 1}
-                </span>
-                {s}
-              </li>
-            ))}
+            {STEPS.map((s, i) => {
+              const visited = i <= maxReached;
+              return (
+                <li key={s}>
+                  <button
+                    type="button"
+                    onClick={() => goTo(i)}
+                    disabled={!visited}
+                    className={`flex items-center gap-1.5 rounded-lg px-1 py-0.5 transition-colors ${
+                      i === step ? "text-brand-700" : i < step ? "text-success-600" : "text-slate-400"
+                    } ${visited ? "cursor-pointer hover:bg-slate-100" : "cursor-default"}`}
+                    aria-current={i === step ? "step" : undefined}
+                  >
+                    <span
+                      className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] transition-colors ${
+                        i < step
+                          ? "bg-success-500 text-white"
+                          : i === step
+                          ? "bg-brand-600 text-white"
+                          : "bg-slate-200 text-slate-500"
+                      }`}
+                    >
+                      {i < step ? <Icon.Check width={12} height={12} /> : i + 1}
+                    </span>
+                    {s}
+                  </button>
+                </li>
+              );
+            })}
           </ol>
         </div>
 
+        <p className="mb-3 text-sm font-medium text-brand-700">
+          Step {step + 1} of {STEPS.length} · <span className="text-muted font-normal">{STEP_HINTS[step]}</span>
+        </p>
+
         <div className="card p-5 sm:p-7">
-          {step === 0 && (
-            <StepPosition job={job} value={form.engagementType} onChange={(v) => set({ engagementType: v })} />
-          )}
-          {step === 1 && <StepAbout form={form} set={set} errors={errors} />}
-          {step === 2 && (
-            <StepResume form={form} set={set} resume={resume} setResume={setResume} />
-          )}
-          {step === 3 && <ExperienceEditor items={experiences} onChange={setExperiences} />}
-          {step === 4 && <EducationEditor items={education} onChange={setEducation} />}
-          {step === 5 && (
-            <StepReview
-              form={form}
-              job={job}
-              resume={resume}
-              experiences={experiences}
-              education={education}
-            />
-          )}
+          <div key={step} className="animate-fade-up">
+            {step === 0 && (
+              <StepPosition job={job} value={form.engagementType} onChange={(v) => set({ engagementType: v })} />
+            )}
+            {step === 1 && <StepAbout form={form} set={set} errors={errors} />}
+            {step === 2 && (
+              <StepResume form={form} set={set} resume={resume} setResume={setResume} />
+            )}
+            {step === 3 && <ExperienceEditor items={experiences} onChange={setExperiences} />}
+            {step === 4 && <EducationEditor items={education} onChange={setEducation} />}
+            {step === 5 && (
+              <StepReview
+                form={form}
+                job={job}
+                resume={resume}
+                experiences={experiences}
+                education={education}
+              />
+            )}
+          </div>
 
           {submitError && (
             <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{submitError}</p>
@@ -205,8 +241,8 @@ export default function Apply() {
           </div>
         </div>
 
-        <p className="mt-4 text-center text-xs text-muted">
-          Step {step + 1} of {STEPS.length}. Your information is kept confidential and used only for recruitment.
+        <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted">
+          <Icon.Shield width={14} height={14} /> Your information is kept confidential and used only for recruitment.
         </p>
       </div>
     </div>

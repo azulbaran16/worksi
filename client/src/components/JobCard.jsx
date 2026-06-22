@@ -12,7 +12,7 @@ export default function JobCard({ job }) {
   return (
     <Link
       to={`/jobs/${job.slug}`}
-      className="card group flex flex-col gap-3 p-5 transition-shadow duration-200 hover:shadow-lift"
+      className="card group flex h-full flex-col gap-3 p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift"
     >
       <div className="flex items-start justify-between gap-3">
         <div>

@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
@@ -12,22 +12,26 @@ import Admin from "./pages/Admin.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 export default function App() {
+  const location = useLocation();
   return (
     <div className="flex min-h-screen flex-col">
       <ScrollToTop />
       <Navbar />
       <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/jobs" element={<Jobs />} />
-          <Route path="/jobs/:slug" element={<JobDetail />} />
-          <Route path="/apply" element={<Apply />} />
-          <Route path="/apply/:slug" element={<Apply />} />
-          <Route path="/employers" element={<Employers />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        {/* key on pathname → content fades in on every route change */}
+        <div key={location.pathname} className="animate-fade-in">
+          <Routes location={location}>
+            <Route path="/" element={<Home />} />
+            <Route path="/jobs" element={<Jobs />} />
+            <Route path="/jobs/:slug" element={<JobDetail />} />
+            <Route path="/apply" element={<Apply />} />
+            <Route path="/apply/:slug" element={<Apply />} />
+            <Route path="/employers" element={<Employers />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
       </main>
       <Footer />
     </div>
