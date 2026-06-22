@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import Logo from "./Logo.jsx";
 import { Icon } from "../icons.jsx";
+import { SITE } from "../config.js";
 
 const links = [
   { to: "/jobs", label: "Find Jobs" },
@@ -30,6 +31,14 @@ export default function Navbar() {
               {l.label}
             </NavLink>
           ))}
+          <a
+            href={SITE.portalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-2 text-sm font-medium rounded-lg text-slate-600 transition-colors hover:text-brand-700 hover:bg-slate-50"
+          >
+            Portal
+          </a>
           <Link to="/apply" className="btn-primary ml-2">
             Apply Now
           </Link>
@@ -53,6 +62,15 @@ export default function Navbar() {
                 {l.label}
               </NavLink>
             ))}
+            <a
+              href={SITE.portalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-brand-700 hover:bg-slate-50"
+              onClick={() => setOpen(false)}
+            >
+              Portal
+            </a>
             <Link to="/apply" className="btn-primary mt-2" onClick={() => setOpen(false)}>
               Apply Now
             </Link>

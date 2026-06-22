@@ -352,19 +352,35 @@ function StepReview({ form, job, resume, experiences, education }) {
   );
 }
 
+const NEXT_STEPS = [
+  { title: "We review your profile", text: "Your application lands directly with our recruitment team." },
+  { title: "A recruiter gets in touch", text: "If there's a match, we'll reach out by phone or email." },
+  { title: "Training & onboarding", text: "We onboard you and match you with the employer best suited to your skills and goals." },
+];
+
 function SuccessScreen({ job }) {
   return (
     <div className="container-page py-20">
-      <div className="mx-auto max-w-lg text-center">
+      <div className="mx-auto max-w-2xl text-center">
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent-500/10 text-accent-600">
           <Icon.Check width={32} height={32} />
         </span>
         <h1 className="mt-5 text-2xl font-bold">Application submitted!</h1>
         <p className="mt-2 text-muted">
-          Thanks for applying{job ? ` for ${job.title}` : ""}. Our recruitment team will review your
-          profile and reach out if there's a match. Keep an eye on your email.
+          Thanks for applying{job ? ` for ${job.title}` : ""}. Here's what happens next.
         </p>
-        <div className="mt-6 flex justify-center gap-3">
+
+        <ol className="mt-8 grid gap-4 text-left sm:grid-cols-3">
+          {NEXT_STEPS.map((s, i) => (
+            <li key={s.title} className="card p-5">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 font-bold text-white">{i + 1}</span>
+              <h3 className="mt-3 text-base font-bold text-brand-900">{s.title}</h3>
+              <p className="mt-1 text-sm text-muted">{s.text}</p>
+            </li>
+          ))}
+        </ol>
+
+        <div className="mt-8 flex justify-center gap-3">
           <Link to="/jobs" className="btn-primary">Browse more jobs</Link>
           <Link to="/" className="btn-outline">Back home</Link>
         </div>

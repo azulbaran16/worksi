@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api } from "../api.js";
 import { Icon } from "../icons.jsx";
 import Spinner from "../components/Spinner.jsx";
+import { SITE } from "../config.js";
 
 export default function Contact() {
   const [form, setForm] = useState({ type: "candidate", name: "", email: "", phone: "", company: "", message: "" });
@@ -36,11 +37,50 @@ export default function Contact() {
 
   return (
     <div className="container-page py-12">
-      <div className="mx-auto max-w-xl">
+      <div className="mx-auto max-w-2xl text-center">
         <h1 className="text-2xl font-bold sm:text-3xl">Contact us</h1>
-        <p className="mt-1 text-muted">Questions about a job or hiring? Send us a message.</p>
+        <p className="mt-1 text-muted">
+          Contact us to learn more about our business and how we can help each other.
+        </p>
+      </div>
 
-        <form onSubmit={submit} className="card mt-6 space-y-4 p-6">
+      <div className="mt-8 grid gap-8 lg:grid-cols-2">
+        {/* Contact details + map */}
+        <div className="space-y-4">
+          <div className="card p-6">
+            <h2 className="text-lg font-bold">Head office</h2>
+            <ul className="mt-4 space-y-4 text-sm">
+              <li className="flex items-start gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600"><Icon.MapPin width={18} height={18} /></span>
+                <span className="text-slate-700">{SITE.contact.address}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600"><Icon.Phone width={18} height={18} /></span>
+                <a href={SITE.contact.phoneHref} className="text-slate-700 hover:text-brand-700">{SITE.contact.phone}</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600"><Icon.Mail width={18} height={18} /></span>
+                <a href={`mailto:${SITE.contact.email}`} className="text-slate-700 hover:text-brand-700">{SITE.contact.email}</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600"><Icon.Clock width={18} height={18} /></span>
+                <span className="text-slate-700">{SITE.contact.hours}</span>
+              </li>
+            </ul>
+          </div>
+          <div className="card overflow-hidden">
+            <iframe
+              title="WorkSi head office map"
+              className="h-64 w-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              src={`https://www.google.com/maps?q=${encodeURIComponent(SITE.mapQuery)}&output=embed`}
+            />
+          </div>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={submit} className="card space-y-4 self-start p-6">
           <div>
             <label className="label">I am a…</label>
             <div className="grid grid-cols-2 gap-3">
