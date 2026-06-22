@@ -1,0 +1,103 @@
+// Prisma schema for WorkSi.
+// Default datasource is SQLite (file-based, zero-config). To switch to PostgreSQL,
+// change `provider` to "postgresql" and update DATABASE_URL accordingly, then run:
+//   npm run db:setup
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Job {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  category       String
+  location       String
+  // TEMPORARY | TEMP_TO_PERM | PERMANENT
+  employmentType String   @default("PERMANENT")
+  payRange       String?
+  summary        String
+  description    String
+  requirements   String?
+  isActive       Boolean  @default(true)
+  featured       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  applications Application[]
+}
+
+model Application {
+  id                String   @id @default(cuid())
+  job               Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  jobId             String?
+  jobTitleSnapshot  String? // keeps the title even if the job is later removed
+
+  firstName         String
+  lastName          String
+  email             String
+  phone             String
+  city              String?
+  province          String?
+
+  // TEMPORARY | TEMP_TO_PERM | PERMANENT
+  engagementType    String   @default("PERMANENT")
+  availability      String?  // e.g. "Immediately", "2 weeks"
+  salaryExpectation String?
+  linkedin          String?
+  skills            String?  // comma-separated
+  coverLetter       String?
+
+  resumePath        String?
+  resumeOriginalName String?
+
+  // NEW | REVIEWING | SHORTLISTED | REJECTED | HIRED
+  status            String   @default("NEW")
+
+  createdAt         DateTime @default(now())
+
+  experiences WorkExperience[]
+  education   Education[]
+}
+
+model WorkExperience {
+  id            String      @id @default(cuid())
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  applicationId String
+  company       String
+  title         String
+  location      String?
+  startDate     String?     // free text / YYYY-MM
+  endDate       String?
+  current       Boolean     @default(false)
+  description   String?
+  sortOrder     Int         @default(0)
+}
+
+model Education {
+  id            String      @id @default(cuid())
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  applicationId String
+  school        String
+  degree        String?
+  field         String?
+  year          String?
+  sortOrder     Int         @default(0)
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  // candidate | employer
+  type      String   @default("candidate")
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  message   String
+  createdAt DateTime @default(now())
+}

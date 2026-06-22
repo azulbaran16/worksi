@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: worksi
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: DATABASE_URL
+        value: file:/data/worksi.db
+    disk:
+      name: worksi-data
+      mountPath: /data
+      sizeGB: 1

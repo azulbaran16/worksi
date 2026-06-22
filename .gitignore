@@ -1,0 +1,27 @@
+node_modules/
+dist/
+build/
+
+# env
+.env
+*.local
+
+# database
+*.db
+*.db-journal
+server/prisma/*.db
+server/prisma/migrations/dev/
+
+# uploads (do not commit candidate resumes)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# logs
+*.log
+npm-debug.log*
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
