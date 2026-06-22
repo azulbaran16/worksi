@@ -3,6 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api.js";
 import { Icon } from "../icons.jsx";
 import JobCard from "../components/JobCard.jsx";
+import HeroArt from "../components/HeroArt.jsx";
+import { CategoryArt } from "../components/CategoryArt.jsx";
+import Avatar from "../components/Avatar.jsx";
 
 const stats = [
   { value: "4,000+", label: "Successful placements" },
@@ -66,7 +69,7 @@ export default function Home() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-brand-900 text-white">
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, #3377f6 0, transparent 40%), radial-gradient(circle at 80% 0%, #10b981 0, transparent 35%)" }} />
-        <div className="container-page relative py-20 sm:py-28">
+        <div className="container-page relative grid items-center gap-10 py-20 sm:py-24 lg:grid-cols-2">
           <div className="max-w-2xl">
             <span className="chip bg-white/10 text-brand-100">
               <Icon.Shield width={14} height={14} /> Licensed staffing &amp; recruitment
@@ -105,6 +108,10 @@ export default function Home() {
                 I'm hiring
               </Link>
             </div>
+          </div>
+
+          <div className="hidden justify-center lg:flex">
+            <HeroArt className="w-full max-w-lg" />
           </div>
         </div>
       </section>
@@ -173,10 +180,10 @@ export default function Home() {
               <Link
                 key={c}
                 to={`/jobs?category=${encodeURIComponent(c)}`}
-                className="card flex items-center justify-between p-4 transition-shadow hover:shadow-lift"
+                className="card flex items-center justify-between gap-3 p-4 transition-shadow hover:shadow-lift"
               >
                 <span className="flex items-center gap-3 font-semibold text-brand-900">
-                  <Icon.Briefcase className="text-brand-500" /> {c}
+                  <CategoryArt category={c} className="h-11 w-11" /> {c}
                 </span>
                 <Icon.ArrowRight width={18} height={18} className="text-slate-400" />
               </Link>
@@ -280,9 +287,7 @@ export default function Home() {
                 <span className="text-brand-200"><Icon.Quote /></span>
                 <blockquote className="mt-3 text-slate-700">"{t.quote}"</blockquote>
                 <figcaption className="mt-4 flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 font-bold text-brand-700">
-                    {t.name.charAt(0)}
-                  </span>
+                  <Avatar name={t.name} className="h-11 w-11" />
                   <span>
                     <span className="block font-semibold text-brand-900">{t.name}</span>
                     <span className="block text-sm text-muted">{t.role}</span>

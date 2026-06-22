@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Icon } from "../icons.jsx";
+import HeroArt from "../components/HeroArt.jsx";
 
 const benefits = [
   { icon: Icon.Clock, title: "Fast turnaround", text: "Pre-screened candidates delivered in days, not weeks." },
@@ -12,7 +13,7 @@ export default function Employers() {
   return (
     <div>
       <section className="bg-brand-900 text-white">
-        <div className="container-page py-20">
+        <div className="container-page grid items-center gap-10 py-20 lg:grid-cols-2">
           <div className="max-w-2xl">
             <span className="chip bg-white/10 text-brand-100">For employers</span>
             <h1 className="mt-4 text-4xl font-extrabold text-white sm:text-5xl">Looking to hire?</h1>
@@ -32,6 +33,10 @@ export default function Employers() {
                 Request talent
               </Link>
             </div>
+          </div>
+
+          <div className="hidden justify-center lg:flex">
+            <HeroArt className="w-full max-w-lg" />
           </div>
         </div>
       </section>
