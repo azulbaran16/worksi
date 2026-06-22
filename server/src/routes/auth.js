@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { prisma } from "../db.js";
 import { hashPassword, verifyPassword, signToken, requireAuth, requireAdminRole } from "../auth.js";
+import { loginLimiter } from "../limits.js";
 
 const router = Router();
 
 // POST /api/auth/login  { email, password }
-router.post("/login", async (req, res, next) => {
+router.post("/login", loginLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Email and password are required." });

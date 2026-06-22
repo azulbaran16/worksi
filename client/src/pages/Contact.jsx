@@ -1,11 +1,18 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { api } from "../api.js";
 import { Icon } from "../icons.jsx";
 import Spinner from "../components/Spinner.jsx";
+import Honeypot from "../components/Honeypot.jsx";
+import useDocumentTitle from "../useDocumentTitle.js";
 import { SITE } from "../config.js";
 
 export default function Contact() {
-  const [form, setForm] = useState({ type: "candidate", name: "", email: "", phone: "", company: "", message: "" });
+  useDocumentTitle("Contact");
+  const [params] = useSearchParams();
+  const initialType = params.get("type") === "employer" ? "employer" : "candidate";
+  const [form, setForm] = useState({ type: initialType, name: "", email: "", phone: "", company: "", message: "" });
+  const [hp, setHp] = useState("");
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
 
@@ -16,7 +23,7 @@ export default function Contact() {
     setError("");
     setStatus("sending");
     try {
-      await api.submitContact(form);
+      await api.submitContact({ ...form, company_website: hp });
       setStatus("sent");
     } catch (err) {
       setError(err.message);
@@ -81,6 +88,7 @@ export default function Contact() {
 
         {/* Form */}
         <form onSubmit={submit} className="card space-y-4 self-start p-6">
+          <Honeypot value={hp} onChange={setHp} />
           <div>
             <label className="label">I am a…</label>
             <div className="grid grid-cols-2 gap-3">

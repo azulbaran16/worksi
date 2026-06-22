@@ -3,11 +3,13 @@ import { Link, useParams } from "react-router-dom";
 import { api, EMPLOYMENT_LABELS } from "../api.js";
 import { Icon } from "../icons.jsx";
 import Spinner from "../components/Spinner.jsx";
+import useDocumentTitle from "../useDocumentTitle.js";
 
 export default function JobDetail() {
   const { slug } = useParams();
   const [job, setJob] = useState(null);
   const [status, setStatus] = useState("loading");
+  useDocumentTitle(job?.title);
 
   useEffect(() => {
     setStatus("loading");

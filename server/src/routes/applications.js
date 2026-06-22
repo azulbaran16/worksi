@@ -2,6 +2,7 @@ import { Router } from "express";
 import { prisma } from "../db.js";
 import { uploadResume } from "../upload.js";
 import { notifyNewApplication } from "../mailer.js";
+import { honeypotBlocked } from "../limits.js";
 
 const router = Router();
 
@@ -22,6 +23,9 @@ const VALID_ENGAGEMENT = new Set(["TEMPORARY", "TEMP_TO_PERM", "PERMANENT"]);
 router.post("/", uploadResume.single("resume"), async (req, res, next) => {
   try {
     const b = req.body;
+
+    // Silently accept (but discard) submissions that tripped the honeypot.
+    if (honeypotBlocked(req)) return res.status(201).json({ ok: true, id: null });
 
     if (!b.firstName || !b.lastName || !b.email || !b.phone) {
       return res.status(400).json({ error: "First name, last name, email and phone are required." });

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Icon } from "../icons.jsx";
 import HeroArt from "../components/HeroArt.jsx";
+import useDocumentTitle from "../useDocumentTitle.js";
 
 const benefits = [
   { icon: Icon.Clock, title: "Fast turnaround", text: "Pre-screened candidates delivered in days, not weeks." },
@@ -10,6 +11,7 @@ const benefits = [
 ];
 
 export default function Employers() {
+  useDocumentTitle("For Employers");
   return (
     <div>
       <section className="bg-brand-900 text-white">
@@ -26,10 +28,10 @@ export default function Employers() {
               placements.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/contact" className="btn-accent">
+              <Link to="/contact?type=employer" className="btn-accent">
                 Request a proposal <Icon.ArrowRight width={18} height={18} />
               </Link>
-              <Link to="/contact" className="btn-outline border-white/30 bg-transparent text-white hover:bg-white/10">
+              <Link to="/contact?type=employer" className="btn-outline border-white/30 bg-transparent text-white hover:bg-white/10">
                 Request talent
               </Link>
             </div>
@@ -85,7 +87,7 @@ export default function Employers() {
           <p className="mt-8 text-sm text-muted">
             We work for many great companies that can provide references upon request.
           </p>
-          <Link to="/contact" className="btn-primary mt-6 inline-flex">Get started</Link>
+          <Link to="/contact?type=employer" className="btn-primary mt-6 inline-flex">Get started</Link>
         </div>
       </section>
     </div>

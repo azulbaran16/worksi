@@ -10,10 +10,14 @@ import applicationsRouter from "./routes/applications.js";
 import contactRouter from "./routes/contact.js";
 import adminRouter from "./routes/admin.js";
 import authRouter from "./routes/auth.js";
+import { formLimiter } from "./limits.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+// Behind a hosting proxy (Render/Railway/etc.) so rate-limiting sees the real client IP.
+app.set("trust proxy", 1);
 
 const origins = (process.env.CORS_ORIGIN || "http://localhost:5173")
   .split(",")
@@ -29,8 +33,8 @@ app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
 // API routes
 app.use("/api/jobs", jobsRouter);
-app.use("/api/applications", applicationsRouter);
-app.use("/api/contact", contactRouter);
+app.use("/api/applications", formLimiter, applicationsRouter);
+app.use("/api/contact", formLimiter, contactRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
 

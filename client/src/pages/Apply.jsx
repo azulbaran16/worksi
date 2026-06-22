@@ -7,6 +7,8 @@ import ResumeDropzone from "../components/ResumeDropzone.jsx";
 import ExperienceEditor from "../components/ExperienceEditor.jsx";
 import EducationEditor from "../components/EducationEditor.jsx";
 import Autocomplete from "../components/Autocomplete.jsx";
+import Honeypot from "../components/Honeypot.jsx";
+import useDocumentTitle from "../useDocumentTitle.js";
 import { PROVINCES, CITIES_BY_PROVINCE, ALL_CITIES } from "../data/canada.js";
 
 const STEPS = ["Position", "About you", "Resume", "Experience", "Education", "Review"];
@@ -57,22 +59,42 @@ const initialForm = {
   coverLetter: "",
 };
 
+const DRAFT_KEY = "worksi_apply_draft";
+function loadDraft() {
+  try {
+    return JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+  } catch {
+    return null;
+  }
+}
+function hasMeaningfulDraft(d) {
+  return Boolean(
+    d &&
+      (d.form?.firstName || d.form?.lastName || d.form?.email || d.form?.phone ||
+        d.experiences?.length || d.education?.length || d.step > 0)
+  );
+}
+
 export default function Apply() {
   const { slug } = useParams();
   const [job, setJob] = useState(null);
   const [jobLoading, setJobLoading] = useState(Boolean(slug));
+  useDocumentTitle(job ? `Apply: ${job.title}` : "Apply");
 
-  const [step, setStep] = useState(0);
-  const [form, setForm] = useState(initialForm);
+  const draft = useMemo(loadDraft, []);
+  const [step, setStep] = useState(() => draft?.step || 0);
+  const [form, setForm] = useState(() => (draft?.form ? { ...initialForm, ...draft.form } : initialForm));
   const [resume, setResume] = useState(null);
-  const [experiences, setExperiences] = useState([]);
-  const [education, setEducation] = useState([]);
+  const [experiences, setExperiences] = useState(() => draft?.experiences || []);
+  const [education, setEducation] = useState(() => draft?.education || []);
 
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [done, setDone] = useState(false);
-  const [maxReached, setMaxReached] = useState(0); // furthest step the user has visited
+  const [maxReached, setMaxReached] = useState(() => draft?.step || 0);
+  const [restored, setRestored] = useState(() => hasMeaningfulDraft(draft));
+  const [hp, setHp] = useState(""); // honeypot
   const topRef = useRef(null);
 
   // Scroll the form into view whenever the step changes (keeps the user oriented).
@@ -82,6 +104,28 @@ export default function Apply() {
       topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [step]);
+
+  // Autosave a draft so progress survives refresh / accidental navigation.
+  // (The resume file can't be serialized, so it must be re-attached.)
+  useEffect(() => {
+    if (done) return;
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ form, step, experiences, education }));
+    } catch {
+      /* storage full or unavailable — ignore */
+    }
+  }, [form, step, experiences, education, done]);
+
+  function startOver() {
+    localStorage.removeItem(DRAFT_KEY);
+    setForm(initialForm);
+    setStep(0);
+    setMaxReached(0);
+    setExperiences([]);
+    setEducation([]);
+    setResume(null);
+    setRestored(false);
+  }
 
   useEffect(() => {
     if (!slug) return;
@@ -137,9 +181,11 @@ export default function Apply() {
       }
       fd.append("experiences", JSON.stringify(experiences));
       fd.append("education", JSON.stringify(education));
+      fd.append("company_website", hp); // honeypot
       if (resume) fd.append("resume", resume);
 
       await api.submitApplication(fd);
+      localStorage.removeItem(DRAFT_KEY);
       setDone(true);
     } catch (err) {
       setSubmitError(err.message || "Something went wrong. Please try again.");
@@ -166,6 +212,21 @@ export default function Apply() {
           </p>
           {jobLoading && <p className="mt-2 text-sm text-muted">Loading position…</p>}
         </div>
+
+        {restored && (
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-brand-100 bg-brand-50 p-3 text-sm">
+            <span className="flex items-center gap-2 text-brand-800">
+              <Icon.Check width={16} height={16} className="text-success-600" />
+              We saved your progress — pick up where you left off.
+              <span className="text-muted">(Please re-attach your resume.)</span>
+            </span>
+            <button type="button" onClick={startOver} className="font-semibold text-brand-700 hover:underline">
+              Start over
+            </button>
+          </div>
+        )}
+
+        <Honeypot value={hp} onChange={setHp} />
 
         {/* Stepper */}
         <div className="mb-6">

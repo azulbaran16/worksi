@@ -6,6 +6,7 @@ import JobCard from "../components/JobCard.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Autocomplete from "../components/Autocomplete.jsx";
 import { jobSuggestLoader, SuggestionRow } from "../components/jobSuggest.jsx";
+import useDocumentTitle from "../useDocumentTitle.js";
 
 function JobCardSkeleton() {
   return (
@@ -23,6 +24,7 @@ function JobCardSkeleton() {
 }
 
 export default function Jobs() {
+  useDocumentTitle("Find Jobs");
   const [params, setParams] = useSearchParams();
   const [jobs, setJobs] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -31,6 +33,15 @@ export default function Jobs() {
   const search = params.get("search") || "";
   const type = params.get("type") || "";
   const category = params.get("category") || "";
+  const sort = params.get("sort") || "";
+  const hasFilters = Boolean(search || type || category || sort);
+
+  const sortedJobs = (() => {
+    const arr = [...jobs];
+    if (sort === "az") arr.sort((a, b) => a.title.localeCompare(b.title));
+    else if (sort === "za") arr.sort((a, b) => b.title.localeCompare(a.title));
+    return arr; // default: backend order (featured first, newest)
+  })();
 
   useEffect(() => {
     api.getCategories().then(setCategories).catch(() => {});
@@ -50,6 +61,10 @@ export default function Jobs() {
     if (value) nextParams.set(key, value);
     else nextParams.delete(key);
     setParams(nextParams);
+  }
+
+  function clearFilters() {
+    setParams(new URLSearchParams());
   }
 
   return (
@@ -82,6 +97,16 @@ export default function Jobs() {
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
+        <select className="field" value={sort} onChange={(e) => update("sort", e.target.value)} aria-label="Sort by">
+          <option value="">Sort: Recommended</option>
+          <option value="az">Title: A–Z</option>
+          <option value="za">Title: Z–A</option>
+        </select>
+        {hasFilters && (
+          <button type="button" className="btn-ghost justify-self-start sm:col-span-3" onClick={clearFilters}>
+            <Icon.X width={16} height={16} /> Clear filters
+          </button>
+        )}
       </div>
 
       {/* Results */}
@@ -92,16 +117,21 @@ export default function Jobs() {
               <JobCardSkeleton key={i} />
             ))}
           </div>
-        ) : jobs.length === 0 ? (
+        ) : sortedJobs.length === 0 ? (
           <div className="card p-10 text-center text-muted">
             <p className="font-semibold text-slate-700">No jobs match your filters.</p>
-            <p className="mt-1 text-sm">Try clearing filters or check back soon — we post new roles daily.</p>
+            <p className="mt-1 text-sm">Try a different search or clear your filters — we post new roles daily.</p>
+            {hasFilters && (
+              <button type="button" className="btn-primary mt-5" onClick={clearFilters}>
+                Clear filters
+              </button>
+            )}
           </div>
         ) : (
           <>
-            <p className="mb-4 text-sm text-muted">{jobs.length} job{jobs.length === 1 ? "" : "s"} found</p>
+            <p className="mb-4 text-sm text-muted">{sortedJobs.length} job{sortedJobs.length === 1 ? "" : "s"} found</p>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {jobs.map((job, i) => (
+              {sortedJobs.map((job, i) => (
                 <Reveal key={job.id} delay={(i % 3) * 70}>
                   <JobCard job={job} />
                 </Reveal>
