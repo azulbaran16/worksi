@@ -26,14 +26,19 @@ const engagementOptions = [
 ];
 
 // Returns a city suggestion loader scoped to the selected province (or all cities).
+// Always lets the user keep a city that isn't in the list (free text).
 function cityLoader(province) {
   const list = province && CITIES_BY_PROVINCE[province] ? CITIES_BY_PROVINCE[province] : ALL_CITIES;
   return (q) => {
-    const ql = (q || "").toLowerCase();
-    return list
-      .filter((c) => c.toLowerCase().includes(ql))
-      .slice(0, 10)
-      .map((c) => ({ label: c, value: c }));
+    const query = (q || "").trim();
+    const ql = query.toLowerCase();
+    const matches = list.filter((c) => c.toLowerCase().includes(ql)).slice(0, 8);
+    const options = matches.map((c) => ({ label: c, value: c }));
+    // If what they typed isn't an exact match, offer it as a custom entry.
+    if (query && !list.some((c) => c.toLowerCase() === ql)) {
+      options.push({ label: query, value: query, custom: true });
+    }
+    return options;
   };
 }
 
@@ -350,10 +355,19 @@ function StepAbout({ form, set, errors }) {
             value={form.city}
             onChange={(t) => set({ city: t })}
             onSelect={(o) => set({ city: o.value })}
-            placeholder={form.province ? "Start typing your city" : "Select a province first (or type)"}
+            placeholder="Start typing your city"
             loadOptions={cityLoader(form.province)}
-            renderOption={(o) => <span>{o.label}</span>}
+            renderOption={(o) =>
+              o.custom ? (
+                <span className="text-slate-700">
+                  Use “{o.label}” <span className="text-xs text-muted">(not listed)</span>
+                </span>
+              ) : (
+                <span>{o.label}</span>
+              )
+            }
           />
+          <p className="mt-1 text-xs text-muted">Don't see your city? Just type it — any city works.</p>
         </Field>
         <Field label="Availability">
           <input className="field" value={form.availability} onChange={(e) => set({ availability: e.target.value })} placeholder="e.g. Immediately, 2 weeks" />
