@@ -5,7 +5,7 @@ import { EMPLOYMENT_LABELS } from "../api.js";
 const typeStyles = {
   TEMPORARY: "bg-amber-50 text-amber-700",
   TEMP_TO_PERM: "bg-violet-50 text-violet-700",
-  PERMANENT: "bg-accent-500/10 text-accent-600",
+  PERMANENT: "bg-success-500/10 text-success-600",
 };
 
 export default function JobCard({ job }) {

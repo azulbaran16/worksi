@@ -103,7 +103,7 @@ export default function RecruitersTab({ token, onAuthError }) {
                   <span className={`chip ${u.role === "ADMIN" ? "bg-brand-50 text-brand-700" : "bg-slate-100 text-slate-600"}`}>{u.role}</span>
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`chip ${u.active ? "bg-accent-500/10 text-accent-600" : "bg-red-50 text-red-700"}`}>
+                  <span className={`chip ${u.active ? "bg-success-500/10 text-success-600" : "bg-red-50 text-red-700"}`}>
                     {u.active ? "Active" : "Disabled"}
                   </span>
                 </td>

@@ -27,7 +27,7 @@ export default function Contact() {
   if (status === "sent")
     return (
       <div className="container-page py-20 text-center">
-        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent-500/10 text-accent-600">
+        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success-500/10 text-success-600">
           <Icon.Check width={32} height={32} />
         </span>
         <h1 className="mt-5 text-2xl font-bold">Message sent</h1>

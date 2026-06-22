@@ -114,7 +114,7 @@ function Toggle({ on, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${on ? "bg-accent-500" : "bg-slate-300"}`}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${on ? "bg-success-500" : "bg-slate-300"}`}
       aria-pressed={on}
     >
       <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${on ? "translate-x-5" : "translate-x-1"}`} />

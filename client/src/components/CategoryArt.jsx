@@ -41,12 +41,12 @@ const ICONS = {
 };
 
 const GRADIENTS = [
-  ["#599dff", "#1f57db"],
-  ["#22d3a8", "#059669"],
-  ["#8ec0ff", "#3377f6"],
-  ["#34d399", "#10b981"],
-  ["#60a5fa", "#1a44b0"],
-  ["#2dd4bf", "#0d9488"],
+  ["#5491cf", "#285d9b"],
+  ["#f4bb33", "#d99a1e"],
+  ["#88b4e1", "#2f6fb5"],
+  ["#5491cf", "#1d3e64"],
+  ["#f7c948", "#c98a12"],
+  ["#3b82c4", "#224b7c"],
 ];
 
 function hash(str) {
@@ -59,6 +59,8 @@ export function CategoryArt({ category, className = "h-11 w-11" }) {
   const icon = ICONS[category] || ICONS["Office & Administration"];
   const [from, to] = GRADIENTS[hash(category) % GRADIENTS.length];
   const id = `cat-${hash(category)}`;
+  // Use dark stroke on gold tiles for contrast, white on blue tiles.
+  const stroke = /^#f/i.test(from) ? "#142d49" : "#ffffff";
   return (
     <span className={`inline-flex items-center justify-center rounded-xl ${className}`}>
       <svg viewBox="0 0 48 48" className="h-full w-full">
@@ -72,7 +74,7 @@ export function CategoryArt({ category, className = "h-11 w-11" }) {
         <g
           transform="translate(12 12)"
           fill="none"
-          stroke="#ffffff"
+          stroke={stroke}
           strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"

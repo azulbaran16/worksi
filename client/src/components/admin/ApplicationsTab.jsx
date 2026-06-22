@@ -10,7 +10,7 @@ const statusColor = {
   REVIEWING: "bg-amber-50 text-amber-700",
   SHORTLISTED: "bg-violet-50 text-violet-700",
   REJECTED: "bg-red-50 text-red-700",
-  HIRED: "bg-accent-500/10 text-accent-600",
+  HIRED: "bg-success-500/10 text-success-600",
 };
 
 export default function ApplicationsTab({ token, onAuthError }) {

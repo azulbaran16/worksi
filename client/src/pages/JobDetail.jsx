@@ -67,7 +67,7 @@ export default function JobDetail() {
                 <ul className="mt-3 space-y-2">
                   {requirements.map((r, i) => (
                     <li key={i} className="flex items-start gap-2 text-slate-700">
-                      <Icon.Check width={18} height={18} className="mt-0.5 shrink-0 text-accent-600" />
+                      <Icon.Check width={18} height={18} className="mt-0.5 shrink-0 text-success-600" />
                       <span>{r}</span>
                     </li>
                   ))}

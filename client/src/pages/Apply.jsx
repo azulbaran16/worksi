@@ -139,13 +139,13 @@ export default function Apply() {
               <li
                 key={s}
                 className={`flex items-center gap-1.5 ${
-                  i === step ? "text-brand-700" : i < step ? "text-accent-600" : "text-slate-400"
+                  i === step ? "text-brand-700" : i < step ? "text-success-600" : "text-slate-400"
                 }`}
               >
                 <span
                   className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${
                     i < step
-                      ? "bg-accent-500 text-white"
+                      ? "bg-success-500 text-white"
                       : i === step
                       ? "bg-brand-600 text-white"
                       : "bg-slate-200 text-slate-500"
@@ -362,7 +362,7 @@ function SuccessScreen({ job }) {
   return (
     <div className="container-page py-20">
       <div className="mx-auto max-w-2xl text-center">
-        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent-500/10 text-accent-600">
+        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success-500/10 text-success-600">
           <Icon.Check width={32} height={32} />
         </span>
         <h1 className="mt-5 text-2xl font-bold">Application submitted!</h1>

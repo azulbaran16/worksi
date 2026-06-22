@@ -68,7 +68,7 @@ export default function Home() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden bg-brand-900 text-white">
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, #3377f6 0, transparent 40%), radial-gradient(circle at 80% 0%, #10b981 0, transparent 35%)" }} />
+        <div className="absolute inset-0 opacity-25" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, #2f6fb5 0, transparent 40%), radial-gradient(circle at 80% 0%, #f2b632 0, transparent 38%)" }} />
         <div className="container-page relative grid items-center gap-10 py-20 sm:py-24 lg:grid-cols-2">
           <div className="max-w-2xl">
             <span className="chip bg-white/10 text-brand-100">
@@ -242,7 +242,7 @@ export default function Home() {
       <section className="container-page py-16">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div>
-            <span className="chip bg-accent-500/10 text-accent-600">Our approach</span>
+            <span className="chip bg-success-500/10 text-success-600">Our approach</span>
             <h2 className="mt-3 text-2xl font-bold sm:text-3xl">A ready talent pool, every single day</h2>
             <p className="mt-4 text-muted">
               We don't wait for a job to start recruiting. We proactively recruit and onboard candidates
@@ -257,7 +257,7 @@ export default function Home() {
                 "Rapid response when you need talent",
               ].map((t) => (
                 <li key={t} className="flex items-start gap-2 text-slate-700">
-                  <Icon.Check width={18} height={18} className="mt-0.5 shrink-0 text-accent-600" />
+                  <Icon.Check width={18} height={18} className="mt-0.5 shrink-0 text-success-600" />
                   <span>{t}</span>
                 </li>
               ))}

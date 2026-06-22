@@ -75,7 +75,7 @@ export default function ResumeDropzone({ file, onChange }) {
       {file && (
         <div className="mt-3 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3">
           <div className="flex items-center gap-3 overflow-hidden">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-500/10 text-accent-600">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-success-500/10 text-success-600">
               <Icon.File width={18} height={18} />
             </span>
             <div className="overflow-hidden">

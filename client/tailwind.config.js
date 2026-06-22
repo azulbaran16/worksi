@@ -4,21 +4,33 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Trustworthy, professional recruitment palette
+        // WorkSi brand palette (from Instagram): azure blue + gold.
         brand: {
-          50: "#eef6ff",
-          100: "#d9eaff",
-          200: "#bcd9ff",
-          300: "#8ec0ff",
-          400: "#599dff",
-          500: "#3377f6",
-          600: "#1f57db",
-          700: "#1a44b0",
-          800: "#1b3b8c",
-          900: "#0f1f4b", // deep navy
+          50: "#eef5fc",
+          100: "#d8e8f7",
+          200: "#b6d2ee",
+          300: "#88b4e1",
+          400: "#5491cf",
+          500: "#2f6fb5", // primary azure
+          600: "#285d9b",
+          700: "#224b7c", // deep blue bars
+          800: "#1d3e64",
+          900: "#142d49", // deep navy-blue
         },
+        // Gold accent — used for CTAs/highlights. Pair with dark text.
         accent: {
-          400: "#22d3a8",
+          50: "#fef6e0",
+          100: "#fde9b8",
+          200: "#fbd97f",
+          300: "#f7c948",
+          400: "#f4bb33",
+          500: "#f2b632",
+          600: "#d99a1e",
+          700: "#b87e15",
+        },
+        // Green — reserved for success / positive status (checks, "hired", toggles).
+        success: {
+          400: "#34d399",
           500: "#10b981",
           600: "#059669",
         },

@@ -1,10 +1,10 @@
 // Deterministic SVG avatar — a gradient disc with an abstract person silhouette.
 const GRADIENTS = [
-  ["#599dff", "#1f57db"],
-  ["#22d3a8", "#059669"],
-  ["#8ec0ff", "#3377f6"],
-  ["#34d399", "#10b981"],
-  ["#60a5fa", "#1a44b0"],
+  ["#5491cf", "#285d9b"],
+  ["#88b4e1", "#2f6fb5"],
+  ["#3b82c4", "#1d3e64"],
+  ["#5491cf", "#224b7c"],
+  ["#6ba0d6", "#285d9b"],
 ];
 
 function hash(str) {
