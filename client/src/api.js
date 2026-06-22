@@ -22,6 +22,8 @@ export const api = {
     return fetch(`${BASE}/api/jobs${qs ? `?${qs}` : ""}`).then(handle);
   },
   getCategories: () => fetch(`${BASE}/api/jobs/categories`).then(handle),
+  suggest: (q) =>
+    fetch(`${BASE}/api/jobs/suggest?q=${encodeURIComponent(q || "")}`).then(handle),
   getJob: (slug) => fetch(`${BASE}/api/jobs/${slug}`).then(handle),
   submitApplication: (formData) =>
     fetch(`${BASE}/api/applications`, { method: "POST", body: formData }).then(handle),

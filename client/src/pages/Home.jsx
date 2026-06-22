@@ -8,6 +8,8 @@ import { CategoryArt } from "../components/CategoryArt.jsx";
 import Avatar from "../components/Avatar.jsx";
 import Reveal from "../components/Reveal.jsx";
 import Counter from "../components/Counter.jsx";
+import Autocomplete from "../components/Autocomplete.jsx";
+import { jobSuggestLoader, SuggestionRow } from "../components/jobSuggest.jsx";
 
 const stats = [
   { to: 4000, suffix: "+", label: "Successful placements" },
@@ -85,18 +87,18 @@ export default function Home() {
             </p>
 
             <form onSubmit={onSearch} className="mt-8 flex flex-col gap-2 sm:flex-row">
-              <div className="relative flex-1">
-                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  <Icon.Search />
-                </span>
-                <input
-                  className="field h-[52px] pl-11 text-base"
-                  placeholder="Job title, skill or city"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  aria-label="Search jobs"
-                />
-              </div>
+              <Autocomplete
+                className="flex-1"
+                inputClassName="h-[52px] text-base"
+                icon={Icon.Search}
+                placeholder="Job title, category or city"
+                aria-label="Search jobs"
+                value={search}
+                onChange={setSearch}
+                loadOptions={jobSuggestLoader}
+                onSelect={(opt) => navigate(`/jobs?search=${encodeURIComponent(opt.value)}`)}
+                renderOption={SuggestionRow}
+              />
               <button type="submit" className="btn-accent h-[52px] px-7 text-base">
                 Search jobs
               </button>

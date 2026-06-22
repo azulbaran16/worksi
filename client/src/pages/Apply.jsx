@@ -6,6 +6,8 @@ import Spinner from "../components/Spinner.jsx";
 import ResumeDropzone from "../components/ResumeDropzone.jsx";
 import ExperienceEditor from "../components/ExperienceEditor.jsx";
 import EducationEditor from "../components/EducationEditor.jsx";
+import Autocomplete from "../components/Autocomplete.jsx";
+import { PROVINCES, CITIES_BY_PROVINCE, ALL_CITIES } from "../data/canada.js";
 
 const STEPS = ["Position", "About you", "Resume", "Experience", "Education", "Review"];
 const STEP_HINTS = [
@@ -22,6 +24,18 @@ const engagementOptions = [
   { value: "TEMP_TO_PERM", label: "Temp-to-Perm", desc: "Start temporary, convert to permanent" },
   { value: "TEMPORARY", label: "Temporary", desc: "Short-term or seasonal contracts" },
 ];
+
+// Returns a city suggestion loader scoped to the selected province (or all cities).
+function cityLoader(province) {
+  const list = province && CITIES_BY_PROVINCE[province] ? CITIES_BY_PROVINCE[province] : ALL_CITIES;
+  return (q) => {
+    const ql = (q || "").toLowerCase();
+    return list
+      .filter((c) => c.toLowerCase().includes(ql))
+      .slice(0, 10)
+      .map((c) => ({ label: c, value: c }));
+  };
+}
 
 const initialForm = {
   engagementType: "PERMANENT",
@@ -319,11 +333,27 @@ function StepAbout({ form, set, errors }) {
         <Field label="Phone *" error={errors.phone}>
           <input type="tel" className="field" value={form.phone} onChange={(e) => set({ phone: e.target.value })} />
         </Field>
-        <Field label="City">
-          <input className="field" value={form.city} onChange={(e) => set({ city: e.target.value })} />
-        </Field>
         <Field label="Province">
-          <input className="field" value={form.province} onChange={(e) => set({ province: e.target.value })} placeholder="e.g. ON" />
+          <select
+            className="field"
+            value={form.province}
+            onChange={(e) => set({ province: e.target.value })}
+          >
+            <option value="">Select province…</option>
+            {PROVINCES.map((p) => (
+              <option key={p.code} value={p.code}>{p.name}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="City">
+          <Autocomplete
+            value={form.city}
+            onChange={(t) => set({ city: t })}
+            onSelect={(o) => set({ city: o.value })}
+            placeholder={form.province ? "Start typing your city" : "Select a province first (or type)"}
+            loadOptions={cityLoader(form.province)}
+            renderOption={(o) => <span>{o.label}</span>}
+          />
         </Field>
         <Field label="Availability">
           <input className="field" value={form.availability} onChange={(e) => set({ availability: e.target.value })} placeholder="e.g. Immediately, 2 weeks" />

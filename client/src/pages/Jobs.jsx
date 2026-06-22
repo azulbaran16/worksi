@@ -4,6 +4,8 @@ import { api, EMPLOYMENT_LABELS } from "../api.js";
 import { Icon } from "../icons.jsx";
 import JobCard from "../components/JobCard.jsx";
 import Reveal from "../components/Reveal.jsx";
+import Autocomplete from "../components/Autocomplete.jsx";
+import { jobSuggestLoader, SuggestionRow } from "../components/jobSuggest.jsx";
 
 function JobCardSkeleton() {
   return (
@@ -57,18 +59,17 @@ export default function Jobs() {
 
       {/* Filters */}
       <div className="card mt-6 grid gap-3 p-4 sm:grid-cols-3">
-        <div className="relative sm:col-span-1">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-            <Icon.Search width={18} height={18} />
-          </span>
-          <input
-            className="field pl-10"
-            placeholder="Search title, skill, city"
-            defaultValue={search}
-            onChange={(e) => update("search", e.target.value)}
-            aria-label="Search jobs"
-          />
-        </div>
+        <Autocomplete
+          className="sm:col-span-1"
+          icon={Icon.Search}
+          placeholder="Search title, category, city"
+          aria-label="Search jobs"
+          value={search}
+          onChange={(t) => update("search", t)}
+          loadOptions={jobSuggestLoader}
+          onSelect={(opt) => update("search", opt.value)}
+          renderOption={SuggestionRow}
+        />
         <select className="field" value={type} onChange={(e) => update("type", e.target.value)} aria-label="Employment type">
           <option value="">All types</option>
           {Object.entries(EMPLOYMENT_LABELS).map(([v, l]) => (
